@@ -1,0 +1,330 @@
+{
+  "name": "My workflow",
+  "nodes": [
+    {
+      "parameters": {
+        "updates": [
+          "message"
+        ],
+        "additionalFields": {}
+      },
+      "type": "n8n-nodes-base.telegramTrigger",
+      "typeVersion": 1.2,
+      "position": [
+        -16,
+        0
+      ],
+      "id": "df263a76-eb0e-4f0a-aafd-cfaf7417c14e",
+      "name": "Telegram Trigger",
+      "webhookId": "7960dbf9-ea12-4afb-9548-7ce216d61778",
+      "credentials": {
+        "telegramApi": {
+          "id": "81rNn1XhaOwcxJs1",
+          "name": "Telegram account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "resource": "file",
+        "fileId": "={{ $json.message.photo[2].file_id }}",
+        "additionalFields": {
+          "mimeType": "image/jpeg"
+        }
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        160,
+        0
+      ],
+      "id": "1b2f2b0b-29a5-4c90-a5ab-0ac65c9c3687",
+      "name": "Get a file",
+      "webhookId": "2178108b-1bd3-4fc2-8e38-547f17516c76",
+      "alwaysOutputData": false,
+      "credentials": {
+        "telegramApi": {
+          "id": "81rNn1XhaOwcxJs1",
+          "name": "Telegram account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "resource": "image",
+        "operation": "analyze",
+        "modelId": {
+          "__rl": true,
+          "value": "gpt-4o",
+          "mode": "id"
+        },
+        "text": "Extract job details \n\nReturn ONLY valid JSON.\n\nDo NOT include:\n\n* ```json\n  ```\n* backticks\n* explanations\n\nOutput must start with { and end with }\n\n{\n\"job_role\": \"\",\n\"company_name\": \"\",\n\"required_skills\": \"\",\n\"hiring_email\": \"\",\n}\n\n\n\n",
+        "inputType": "base64",
+        "binaryPropertyName": "=data",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.openAi",
+      "typeVersion": 2.1,
+      "position": [
+        352,
+        0
+      ],
+      "id": "8899c0d1-a57c-4f0f-98e7-dcc506b6f977",
+      "name": "Analyze image",
+      "credentials": {
+        "openAiApi": {
+          "id": "krsv1HKTSyZDxsSQ",
+          "name": "OpenAi account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "download",
+        "fileId": {
+          "__rl": true,
+          "value": "1OJJTDqelfkqVKeox59hb650ppNqrovtV",
+          "mode": "id"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleDrive",
+      "typeVersion": 3,
+      "position": [
+        160,
+        -160
+      ],
+      "id": "74ea493c-ebe1-4c47-bdef-3aa515f2fc4a",
+      "name": "Download file",
+      "credentials": {
+        "googleDriveOAuth2Api": {
+          "id": "TTkt2IdPiTMmStAr",
+          "name": "Google Drive account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "pdf",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.extractFromFile",
+      "typeVersion": 1.1,
+      "position": [
+        368,
+        -160
+      ],
+      "id": "40182a45-2de3-47a6-a6d8-416f77fa0718",
+      "name": "Extract from File"
+    },
+    {
+      "parameters": {
+        "modelId": {
+          "__rl": true,
+          "value": "gpt-5",
+          "mode": "id"
+        },
+        "responses": {
+          "values": [
+            {
+              "content": "=You are an AI career assistant helping a candidate apply for jobs.\n\nHere are the details of the job opportunity:\n\n* Role: {{ $('Edit Fields').item.json.job_role }}\n* Company: {{ $('Edit Fields').item.json.company_name }}\n* Required Skills: {{ $('Edit Fields').item.json.required_skills }}\n* Hiring Email: {{ $('Edit Fields').item.json.hiring_email }}\n\nHere is the candidate’s resume:\n\n{{ $json.text }}\n\nWrite a personalized and professional job application email tailored to this role.\n\nGuidelines:\n\n* Clearly highlight relevant skills and experience from the resume\n* Align the candidate’s background with the job requirements\n* Keep the tone natural, confident, and concise\n* Do NOT use placeholders like [Your Name]\n* Do NOT include a subject line\n"
+            }
+          ]
+        },
+        "builtInTools": {},
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.openAi",
+      "typeVersion": 2.1,
+      "position": [
+        896,
+        16
+      ],
+      "id": "478b74f6-a704-4a57-a90a-3b4539c542fa",
+      "name": "Message a model",
+      "credentials": {
+        "openAiApi": {
+          "id": "krsv1HKTSyZDxsSQ",
+          "name": "OpenAi account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "mode": "combine",
+        "combineBy": "combineByPosition",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 3.2,
+      "position": [
+        752,
+        16
+      ],
+      "id": "d749ee11-6a92-4bd9-9283-2115662b2fa1",
+      "name": "Merge"
+    },
+    {
+      "parameters": {
+        "mode": "raw",
+        "jsonOutput": "={{ $json['0'].content[0].text }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        560,
+        0
+      ],
+      "id": "79fc7e33-b00f-4b3c-8f0f-7174c42bfc70",
+      "name": "Edit Fields"
+    },
+    {
+      "parameters": {
+        "sendTo": "={{ $('Edit Fields').item.json.hiring_email }}",
+        "subject": "=Job application for  {{ $('Edit Fields').item.json.job_role }} role - Neelam Venkata Siva Chandu",
+        "emailType": "text",
+        "message": "={{ $json.output[0].content[0].text }}",
+        "options": {
+          "appendAttribution": false
+        }
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.2,
+      "position": [
+        1248,
+        16
+      ],
+      "id": "0c0b71b3-ed96-46c8-9d50-957f5878f452",
+      "name": "Send a message",
+      "webhookId": "36dfb2ac-1e11-4e0b-8e53-9d9a2c9849c5",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "rtSa5vxcXsmcfONt",
+          "name": "Gmail OAuth2 API"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Telegram Trigger": {
+      "main": [
+        [
+          {
+            "node": "Get a file",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Download file",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get a file": {
+      "main": [
+        [
+          {
+            "node": "Analyze image",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Download file": {
+      "main": [
+        [
+          {
+            "node": "Extract from File",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Extract from File": {
+      "main": [
+        [
+          {
+            "node": "Merge",
+            "type": "main",
+            "index": 1
+          }
+        ]
+      ]
+    },
+    "Analyze image": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Merge": {
+      "main": [
+        [
+          {
+            "node": "Message a model",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Message a model": {
+      "main": [
+        [
+          {
+            "node": "Send a message",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields": {
+      "main": [
+        [
+          {
+            "node": "Merge",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Send a message": {
+      "main": [
+        []
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate",
+    "availableInMCP": false
+  },
+  "versionId": "bb061ebb-030c-4c84-be59-a08e1edbbacb",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "2340c122a2e48a585056314b120b3defbd14e203846f78f29d839b0296376d19"
+  },
+  "id": "2yXcpsFqI7k2icG6",
+  "tags": [
+    {
+      "updatedAt": "2026-03-16T11:01:56.182Z",
+      "createdAt": "2026-03-16T11:01:56.182Z",
+      "id": "dL7Q9vPgmic4nEHd",
+      "name": "job-helper"
+    }
+  ]
+}
