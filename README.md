@@ -43,7 +43,7 @@ This project automates repetitive job application tasks by combining workflow au
 > Add your workflow screenshot here
 
 ```md
-![Workflow](./assets/workflow.png)
+![Workflow](./assets/workflow-visual.png)
 ```
 
 *(Upload your n8n workflow screenshot inside an `assets` folder in your repo)*
