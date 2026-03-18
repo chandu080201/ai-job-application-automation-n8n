@@ -37,16 +37,9 @@ This project automates repetitive job application tasks by combining workflow au
 7. Email is sent to the recruiter automatically
 
 ---
-
 ## 🖼️ Workflow Diagram
 
-> Add your workflow screenshot here
-
-```md
 ![Workflow](./assets/workflow-visual.jpeg)
-```
-
-*(Upload your n8n workflow screenshot inside an `assets` folder in your repo)*
 
 ---
 
