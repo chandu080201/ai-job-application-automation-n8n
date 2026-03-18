@@ -110,7 +110,7 @@ This project automates repetitive job application tasks by combining workflow au
 
 **Neelam Venkata Siva Chandu**
 📧 [chanduneelam08@gmail.com](mailto:chanduneelam08@gmail.com)
-🔗 LinkedIn: *(add your link)*
+🔗 LinkedIn: *(https://www.linkedin.com/in/sivachandu08/)*
 
 ---
 
